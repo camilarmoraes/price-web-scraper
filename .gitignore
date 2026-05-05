@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual env
+.venv/
+
+# Env vars
+.env
+
+# Banco local gerado em runtime
+*.db
+*.db-journal
+
+# Streamlit
+.streamlit/
+
+# Coverage
+htmlcov/
+.coverage
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Exports gerados
+exports/
