@@ -33,6 +33,28 @@ class TestZoomSearch:
         soup = BeautifulSoup("<html><body></body></html>", "html.parser")
         assert ZoomScraper().parse_search_results(soup, max_results=5) == []
 
+    def test_descarta_cards_patrocinados_com_lead(self) -> None:
+        # Cards patrocinados linkam direto pra /lead?oid=... (redirect afiliado);
+        # não são páginas de detalhe, então não dá pra extrair ofertas deles.
+        html = """
+        <article data-testid='product-card'>
+          <a data-testid='product-card::card'
+             href='https://www.zoom.com.br/lead?oid=123&vtex=true'></a>
+          <span data-testid='product-card::name'>Patrocinado</span>
+          <span data-testid='product-card::price'><strong>R$ 1.999,00</strong></span>
+        </article>
+        <article data-testid='product-card'>
+          <a data-testid='product-card::card' href='/geladeira/foo?_lc=88'></a>
+          <span data-testid='product-card::name'>Geladeira Foo</span>
+          <span data-testid='product-card::price'><strong>R$ 2.999,00</strong></span>
+        </article>
+        """
+        soup = BeautifulSoup(html, "html.parser")
+        results = ZoomScraper().parse_search_results(soup, max_results=5)
+        assert len(results) == 1
+        assert "/lead?" not in results[0]["url"]
+        assert results[0]["title"] == "Geladeira Foo"
+
 
 class TestZoomOfferList:
     def test_extrai_ofertas_por_loja(self, zoom_product_html: str) -> None:

@@ -1,4 +1,4 @@
-"""Orquestra a busca: scrapers em cascata → resolve redirects → persiste."""
+"""Orquestra a busca: roda todos os scrapers → resolve redirects → persiste."""
 
 from __future__ import annotations
 
@@ -60,16 +60,18 @@ class PriceSearchService:
         return results
 
     def _search_all(self, product_name: str) -> list[dict]:
-        """Tenta cada scraper em ordem; retorna assim que um deles produz resultados."""
+        """Roda todos os scrapers e concatena os resultados de cada um."""
+        all_results: list[dict] = []
         for scraper in self.scrapers:
             results = scraper.search(product_name, max_results=self.max_results_per_item)
             if results:
                 for r in results:
                     r["source"] = scraper.name
                 logger.info("[%s] %d resultados", scraper.name, len(results))
-                return results
-            logger.info("[%s] sem resultados — tentando próximo scraper", scraper.name)
-        return []
+                all_results.extend(results)
+            else:
+                logger.info("[%s] sem resultados", scraper.name)
+        return all_results
 
     def _resolve_offers(self, candidates: list[dict]) -> list[dict]:
         """Para cada candidato, abre a página de produto e expande em ofertas por loja.

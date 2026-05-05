@@ -17,6 +17,30 @@ class TestBuscapeSearch:
             assert r["price"] > 0
 
 
+    def test_descarta_cards_patrocinados_com_lead(self) -> None:
+        # Cards patrocinados linkam direto pra /lead?oid=... (redirect afiliado);
+        # não são páginas de detalhe, então não dá pra extrair ofertas deles.
+        html = """
+        <div class='ProductCard'>
+          <a href='https://www.buscape.com.br/lead?oid=123&vtex=true'>
+            <h2 class='Title'>Patrocinado: Geladeira Foo</h2>
+          </a>
+          <span class='Price'>R$ 1.999,00</span>
+        </div>
+        <div class='ProductCard'>
+          <a href='/geladeira/foo?_lc=88'>
+            <h2 class='Title'>Geladeira Bar</h2>
+          </a>
+          <span class='Price'>R$ 2.999,00</span>
+        </div>
+        """
+        soup = BeautifulSoup(html, "html.parser")
+        results = BuscapeScraper().parse_search_results(soup, max_results=5)
+        assert len(results) == 1
+        assert "/lead?" not in results[0]["url"]
+        assert results[0]["title"] == "Geladeira Bar"
+
+
 class TestBuscapeOfferList:
     def test_extrai_ofertas_com_seletores_diversos(self, buscape_product_html: str) -> None:
         soup = BeautifulSoup(buscape_product_html, "html.parser")

@@ -98,6 +98,12 @@ class ZoomScraper:
         if href and not href.startswith("http"):
             href = self.BASE_URL + href
 
+        # Cards patrocinados linkam direto pra /lead?oid=... (redirect afiliado),
+        # não pra página de detalhe do produto — descartá-los evita que
+        # get_store_offers tente extrair ofertas de uma página de loja final.
+        if href and "/lead?" in href:
+            return None
+
         if not title or price is None or not href:
             return None
         return {"title": title, "store": store_name, "url": href, "price": price}

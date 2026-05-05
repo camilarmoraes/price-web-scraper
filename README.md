@@ -2,8 +2,9 @@
 
 > Web scraper que consolida ofertas dos comparadores brasileiros **Zoom** e **Buscapé** numa base histórica local, com bypass de detecção anti-bot e dashboard interativo em Streamlit.
 
-<!-- Substitua por um GIF do dashboard funcionando: docs/images/dashboard.gif -->
-![dashboard](docs/images/dashboard.png)
+![Resultados consolidados Zoom + Buscapé](docs/images/tela-busca2.png)
+
+![Resultados consolidados Zoom + Buscapé2](docs/images/tela_busca3.png)
 
 ---
 
@@ -14,18 +15,31 @@ Comparadores brasileiros não expõem API pública, os preços oscilam constante
 - Comparar ofertas de várias lojas para um produto específico,
 - Acompanhar a evolução do preço ao longo do tempo,
 - Ou simplesmente extrair o link real da loja (sem o redirect de tracking),
-
 precisa fazer scraping resiliente, com renderização de JavaScript e bypass de detecção anti-bot.
 
 ## A solução
 
 Pipeline completo em Python:
 
-1. **Busca** o produto no Zoom (com Buscapé como fallback);
+1. **Busca** o produto em Zoom e Buscapé e consolida as ofertas dos dois;
 2. Para cada candidato, abre a página de produto e **extrai ofertas por loja**;
 3. **Segue o redirect** de tracking via Playwright headless até a URL real do e-commerce;
 4. **Persiste** no SQLite local com timestamp — formando uma série histórica de preços;
 5. Dashboard Streamlit consulta a base e plota a **evolução de preços** por loja.
+
+## Visualização
+
+**Tela inicial** — sidebar com filtros, busca e histórico; área principal com as ofertas ordenadas pelo menor preço.
+
+![Tela inicial](docs/images/tela-inicial.png)
+
+**Resultados de uma busca** — destaca menor preço, número de ofertas e quantidade de fontes (comparadores) que retornaram resultado, com link direto para a loja final após o follow-redirect.
+
+![Tela de resultados](docs/images/tela-busca.png)
+
+**Histórico de preços** — gráfico de evolução por loja e tabela com a última cotação consolidada.
+
+![Histórico de preços](docs/images/historico-preco.png)
 
 ## Stack
 
@@ -104,7 +118,7 @@ Veja [`docs/architecture.md`](docs/architecture.md) para o diagrama detalhado.
 └─────────────────┘                            │
                                                ▼
                               ┌──────────────────────────────┐
-                              │  ZoomScraper / BuscapeScraper│  (fallback em cadeia)
+                              │  ZoomScraper / BuscapeScraper│  (rodam em sequência, resultados concatenados)
                               └────────────┬─────────────────┘
                                            │ HTML
                               ┌────────────▼─────────────────┐

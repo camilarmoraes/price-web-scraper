@@ -32,3 +32,6 @@ Thumbs.db
 
 # Exports gerados
 exports/
+
+# Dumps de HTML gerados pelos scripts de diagnóstico em examples/
+_dumps/
