@@ -145,7 +145,6 @@ src/price_crawler/
     └── exporters.py  # to_csv, to_json
 app/streamlit_app.py
 tests/                # pytest + fixtures HTML
-legacy/               # versão monolítica original (referência)
 ```
 
 ## Próximos passos
